@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>情劫命格 · 天命占卜</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #07071a;
+    --surface: rgba(255,255,255,0.04);
+    --gold: #c9a84c;
+    --gold2: #f0d080;
+    --purple: #9b6ef3;
+    --purple2: #c4a0ff;
+    --red: #e05c7a;
+    --text: #e8dfc8;
+    --text-dim: rgba(232,223,200,0.55);
+    --border: rgba(201,168,76,0.18);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Serif SC', serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  #stars-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .nebula {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.13;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .nebula-1 { width: 500px; height: 500px; background: var(--purple); top: -120px; right: -100px; }
+  .nebula-2 { width: 400px; height: 400px; background: var(--red); bottom: -80px; left: -100px; }
+  .nebula-3 { width: 300px; height: 300px; background: var(--gold); top: 40%; left: 50%; transform: translate(-50%, -50%); opacity: 0.07; }
+
+  #app {
+    position: relative;
+    z-index: 1;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0 20px 80px;
+  }
+
+  .screen {
+    display: block;
+    padding-top: 44px;
+  }
+
+  .screen.hidden {
+    display: none !important;
+  }
+
+  #screen-intro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 0;
+    min-height: 100vh;
+    padding-top: 0;
+  }
+
+  #screen-quiz {
+    padding-top: 44px;
+  }
+
+  #screen-result {
+    padding-top: 40px;
+    animation: fade-in 0.8s ease;
+  }
+
+  #screen-loading {
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 24px;
+    padding-top: 60px;
+  }
+
+  .symbol-ring {
+    width: 130px;
+    height: 130px;
+    border: 1.5px solid var(--border);
+    border-radius: 50%;
+    position: relative;
+    margin-bottom: 28px;
+    animation: spin-slow 30s linear infinite;
+  }
+  .symbol-ring::before {
+    content: '';
+    position: absolute;
+    inset: 12px;
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 50%;
+  }
+  .symbol-ring::after {
+    content: '☽';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    animation: spin-slow 30s linear infinite reverse;
+    color: var(--gold);
+    text-shadow: 0 0 30px rgba(201,168,76,0.7);
+  }
+
+  .dot-ring {
+    position: absolute;
+    inset: -18px;
+    border-radius: 50%;
+  }
+
+  .dot {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    background: var(--gold);
+    border-radius: 50%;
+    box-shadow: 0 0 6px var(--gold);
+  }
+
+  @keyframes spin-slow { to { transform: rotate(360deg); } }
+  @keyframes card-in {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes shimmer {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+  }
+
+  .intro-eyebrow {
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    opacity: 0.8;
+  }
+
+  .intro-title {
+    font-family: 'Ma Shan Zheng', serif;
+    font-size: clamp(36px, 9vw, 50px);
+    color: var(--gold2);
+    text-shadow: 0 0 40px rgba(240,208,128,0.4), 0 0 80px rgba(201,168,76,0.2);
+    line-height: 1.15;
+    margin-bottom: 8px;
+  }
+
+  .intro-sub {
+    font-size: 13px;
+    letter-spacing: 6px;
+    color: var(--text-dim);
+    margin-bottom: 24px;
+  }
+
+  .intro-divider,
+  .glow-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .intro-divider {
+    width: 120px;
+    margin: 0 auto 24px;
+  }
+
+  .intro-desc {
+    font-size: 13px;
+    line-height: 1.9;
+    color: var(--text-dim);
+    max-width: 356px;
+    margin-bottom: 18px;
+  }
+
+  .intro-note {
+    background: rgba(201,168,76,0.06);
+    border: 1px solid rgba(201,168,76,0.18);
+    color: rgba(232,223,200,0.82);
+    font-size: 12px;
+    line-height: 1.8;
+    padding: 10px 14px;
+    border-radius: 4px;
+    max-width: 370px;
+    margin-bottom: 18px;
+  }
+
+  .intro-ornaments {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--gold);
+    font-size: 18px;
+    margin-bottom: 10px;
+    opacity: 0.5;
+  }
+
+  .btn-start,
+  .btn-next,
+  .btn-prev,
+  .btn-restart {
+    font-family: 'Noto Serif SC', serif;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .btn-start {
+    background: linear-gradient(135deg, rgba(201,168,76,0.15), rgba(155,110,243,0.12));
+    border: 1px solid var(--gold);
+    color: var(--gold2);
+    font-size: 15px;
+    letter-spacing: 3px;
+    padding: 16px 52px;
+    position: relative;
+    overflow: hidden;
+    text-shadow: 0 0 20px rgba(240,208,128,0.5);
+  }
+  .btn-start::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(201,168,76,0.25), rgba(155,110,243,0.2));
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  .btn-start:hover::before { opacity: 1; }
+  .btn-start:hover {
+    box-shadow: 0 0 30px rgba(201,168,76,0.3), 0 0 60px rgba(201,168,76,0.1);
+    transform: translateY(-1px);
+  }
+
+  .quiz-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .quiz-counter {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    white-space: nowrap;
+  }
+
+  .quiz-counter span {
+    color: var(--gold);
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .progress-track {
+    flex: 1;
+    height: 2px;
+    background: rgba(255,255,255,0.08);
+    margin: 0 14px;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--purple), var(--gold));
+    border-radius: 2px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 8px var(--gold);
+  }
+
+  .question-card,
+  .result-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .question-card {
+    padding: 24px 22px 22px;
+    animation: card-in 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .question-card::before,
+  .result-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .question-num {
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--purple2);
+    margin-bottom: 12px;
+    opacity: 0.7;
+  }
+
+  .question-text {
+    font-size: 15px;
+    line-height: 1.8;
+    color: var(--text);
+    margin-bottom: 20px;
+    font-weight: 400;
+  }
+
+  .options-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .option-btn {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--text);
+    font-family: 'Noto Serif SC', serif;
+    font-size: 13.5px;
+    line-height: 1.65;
+    padding: 12px 16px;
+    border-radius: 2px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.25s;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .option-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(201,168,76,0.1), rgba(155,110,243,0.08));
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+
+  .option-btn:hover {
+    border-color: rgba(201,168,76,0.4);
+    transform: translateX(4px);
+    box-shadow: -2px 0 0 var(--gold), 0 4px 20px rgba(0,0,0,0.3);
+  }
+
+  .option-btn:hover::after,
+  .option-btn.selected::after { opacity: 1; }
+
+  .option-btn.selected {
+    border-color: var(--gold);
+    background: rgba(201,168,76,0.1);
+    box-shadow: -3px 0 0 var(--gold), 0 0 20px rgba(201,168,76,0.15);
+  }
+
+  .option-label {
+    width: 22px;
+    height: 22px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    flex-shrink: 0;
+    color: var(--gold);
+    margin-top: 1px;
+    transition: all 0.25s;
+  }
+
+  .option-btn:hover .option-label,
+  .option-btn.selected .option-label {
+    background: var(--gold);
+    color: var(--bg);
+    border-color: var(--gold);
+  }
+
+  /* 导航按钮行：左"返回"，右"继续" */
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    gap: 12px;
+  }
+
+  .btn-next,
+  .btn-prev {
+    background: transparent;
+    font-size: 13px;
+    letter-spacing: 2px;
+    padding: 10px 22px;
+  }
+
+  .btn-next {
+    border: 1px solid rgba(201,168,76,0.3);
+    color: var(--gold);
+    opacity: 0;
+    pointer-events: none;
+    margin-left: auto;
+  }
+
+  .btn-next.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .btn-next:hover {
+    background: rgba(201,168,76,0.1);
+    border-color: var(--gold);
+    box-shadow: 0 0 20px rgba(201,168,76,0.2);
+  }
+
+  .btn-prev {
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text-dim);
+  }
+
+  .btn-prev:hover {
+    border-color: rgba(201,168,76,0.3);
+    color: var(--text);
+  }
+
+  .btn-prev.hidden-btn {
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .loading-ring {
+    width: 80px;
+    height: 80px;
+    border: 2px solid rgba(201,168,76,0.1);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  .loading-text {
+    font-size: 13px;
+    letter-spacing: 4px;
+    color: var(--text-dim);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .result-header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+
+  .result-eyebrow {
+    font-size: 10px;
+    letter-spacing: 5px;
+    color: var(--gold);
+    opacity: 0.7;
+    margin-bottom: 14px;
+  }
+
+  .result-fate-name {
+    font-family: 'Ma Shan Zheng', serif;
+    font-size: clamp(30px, 8vw, 44px);
+    color: var(--gold2);
+    text-shadow: 0 0 40px rgba(240,208,128,0.5), 0 0 80px rgba(201,168,76,0.25);
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  .result-type-tag {
+    display: inline-block;
+    background: rgba(155,110,243,0.15);
+    border: 1px solid rgba(155,110,243,0.4);
+    color: var(--purple2);
+    font-size: 11px;
+    letter-spacing: 2px;
+    padding: 5px 16px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+
+  .glow-divider {
+    margin: 20px 0;
+    box-shadow: 0 0 8px rgba(201,168,76,0.4);
+  }
+
+  .result-card {
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+
+  .result-card-title {
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--gold);
+    opacity: 0.7;
+    margin-bottom: 12px;
+  }
+
+  .result-desc {
+    font-size: 14px;
+    line-height: 2;
+    color: var(--text);
+    white-space: pre-line;
+  }
+
+  .secondary-fate {
+    margin-top: 8px;
+  }
+
+  .secondary-item {
+    margin-bottom: 12px;
+  }
+
+  .secondary-header {
+    background: rgba(201,168,76,0.08);
+    border: 1px solid rgba(201,168,76,0.2);
+    color: var(--gold);
+    font-size: 12px;
+    letter-spacing: 1px;
+    padding: 8px 14px;
+    border-radius: 2px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.25s;
+  }
+
+  .secondary-header:hover {
+    background: rgba(201,168,76,0.15);
+    border-color: rgba(201,168,76,0.4);
+  }
+
+  .arrow {
+    font-size: 10px;
+    transition: transform 0.25s;
+  }
+
+  .secondary-item.expanded .arrow {
+    transform: rotate(90deg);
+  }
+
+  .expand-text {
+    opacity: 0.7;
+    font-size: 11px;
+  }
+
+  .secondary-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--text);
+    margin-top: 8px;
+    padding-left: 14px;
+    border-left: 2px solid rgba(201,168,76,0.3);
+  }
+
+  .secondary-item.expanded .secondary-content {
+    max-height: 500px; /* Adjust based on content */
+  }
+
+  .chart-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    max-width: 340px;
+    margin: 0 auto;
+    padding: 8px;
+  }
+
+  .oracle-box {
+    background: linear-gradient(135deg, rgba(155,110,243,0.08), rgba(201,168,76,0.05));
+    border: 1px solid rgba(155,110,243,0.25);
+    border-radius: 4px;
+    padding: 22px 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .oracle-box::before,
+  .oracle-box::after {
+    content: '✦';
+    position: absolute;
+    opacity: 0.4;
+    font-size: 14px;
+  }
+
+  .oracle-box::before {
+    top: 12px;
+    left: 20px;
+    color: var(--purple);
+  }
+
+  .oracle-box::after {
+    bottom: 12px;
+    right: 20px;
+    color: var(--gold);
+  }
+
+  .oracle-text {
+    font-family: 'Ma Shan Zheng', serif;
+    font-size: 16px;
+    line-height: 2;
+    color: var(--purple2);
+    text-shadow: 0 0 20px rgba(196,160,255,0.3);
+    white-space: pre-line;
+  }
+
+  .btn-restart {
+    display: block;
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 13px;
+    letter-spacing: 2px;
+    padding: 14px;
+    margin-top: 24px;
+    text-align: center;
+  }
+
+  .btn-restart:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+    box-shadow: 0 0 20px rgba(201,168,76,0.1);
+  }
+
+  .stars-shimmer {
+    animation: shimmer 3s ease-in-out infinite;
+  }
+
+  @media (max-width: 640px) {
+    #app { padding: 0 14px 70px; }
+    #screen-intro { padding-top: 0; }
+    #screen-quiz { padding-top: 32px; }
+    #screen-result { padding-top: 28px; }
+    .question-card { padding: 18px 16px 16px; }
+    .result-card, .oracle-box { padding-left: 18px; padding-right: 18px; }
+    .question-text { font-size: 14.5px; }
+    .quiz-header { gap: 8px; }
+    .symbol-ring { width: 110px; height: 110px; margin-bottom: 20px; }
+    .symbol-ring::after { font-size: 40px; }
+    .intro-desc { font-size: 12.5px; }
+    .btn-prev, .btn-next { font-size: 12px; padding: 9px 16px; letter-spacing: 1px; }
+    .option-btn { font-size: 13px; padding: 11px 14px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="stars-canvas"></canvas>
+<div class="nebula nebula-1"></div>
+<div class="nebula nebula-2"></div>
+<div class="nebula nebula-3"></div>
+
+<div id="app">
+  <div id="screen-intro" class="screen">
+    <div class="symbol-ring">
+      <div class="dot-ring" id="dot-ring"></div>
+    </div>
+    <div class="intro-eyebrow">紫微命理 · 缘分推演</div>
+    <div class="intro-title">情劫命格</div>
+    <div class="intro-sub">· JUST FOR FUN ·</div>
+    <div class="intro-divider"></div>
+    <div class="intro-desc">
+      你与感情的关系，究竟有怎样的命定模式？<br>
+      是难以放下的执念，还是轻飘飘游戏人间？<br>
+      是本能牵引，还是现实条件的权衡？<br><br>
+      通过 15 道情境题，星盘会描摹你在亲密关系里<br>
+      最容易触发的情劫模式。
+    </div>
+    <div class="intro-note">
+      小提示：如果一时选不出来，不用纠结"百分百准确"，请尽量选择和你平时状态最接近、最匹配的一项。
+    </div>
+    <div class="intro-ornaments">✦ &nbsp; ✧ &nbsp; ★ &nbsp; ✧ &nbsp; ✦</div>
+    <br>
+    <button class="btn-start" onclick="startQuiz()">开启星盘测算</button>
+  </div>
+
+  <div id="screen-quiz" class="screen hidden" aria-hidden="true">
+    <div class="quiz-header">
+      <div class="quiz-counter"><span id="q-current">1</span> / 15</div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+      <div style="font-size:11px;letter-spacing:1px;color:var(--text-dim)">命格</div>
+    </div>
+    <div class="question-card" id="question-card">
+      <div class="question-num" id="question-num">QUESTION 01</div>
+      <div class="question-text" id="question-text"></div>
+      <div class="options-grid" id="options-grid"></div>
+    </div>
+    <div class="nav-row">
+      <button class="btn-prev hidden-btn" id="btn-prev" onclick="prevQuestion()">← 返回上题</button>
+      <button class="btn-next" id="btn-next" onclick="nextQuestion()">继续 →</button>
+    </div>
+  </div>
+
+  <div id="screen-loading" class="screen hidden" aria-hidden="true">
+    <div class="loading-ring"></div>
+    <div class="loading-text">星盘运算中 · · ·</div>
+  </div>
+
+  <div id="screen-result" class="screen hidden" aria-hidden="true">
+    <div class="result-header">
+      <div class="result-eyebrow">⋆ 你的情劫命格 ⋆</div>
+      <div class="result-fate-name" id="result-name">—</div>
+      <div class="result-type-tag" id="result-tag">—</div>
+    </div>
+
+    <div class="result-card">
+      <div class="result-card-title">▸ 命格解析</div>
+      <div class="result-desc" id="result-desc">—</div>
+    </div>
+
+    <div class="result-card" id="secondary-card" style="display:none">
+      <div class="result-card-title">▸ 次要命格</div>
+      <div class="secondary-fate" id="secondary-fates"></div>
+    </div>
+
+    <div class="result-card">
+      <div class="result-card-title">▸ 命格星盘分布</div>
+      <div class="chart-container">
+        <canvas id="fate-chart"></canvas>
+      </div>
+    </div>
+
+    <div class="oracle-box">
+      <div class="oracle-text" id="oracle-text">—</div>
+    </div>
+
+    <button class="btn-restart" onclick="restart()">✦ &nbsp; 重新测算 &nbsp; ✦</button>
+  </div>
+</div>
+
+<script>
+(function() {
+  const canvas = document.getElementById('stars-canvas');
+  const ctx = canvas.getContext('2d');
+  let stars = [];
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    initStars();
+  }
+
+  function initStars() {
+    stars = [];
+    const count = Math.floor((canvas.width * canvas.height) / 3500);
+    for (let i = 0; i < count; i++) {
+      stars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 1.3 + 0.2,
+        o: Math.random() * 0.7 + 0.15,
+        speed: Math.random() * 0.5 + 0.1,
+        phase: Math.random() * Math.PI * 2,
+      });
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const t = Date.now() / 1000;
+    stars.forEach((s) => {
+      const alpha = s.o * (0.6 + 0.4 * Math.sin(t * s.speed + s.phase));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,245,210,${alpha})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+  draw();
+
+  const dotRing = document.getElementById('dot-ring');
+  if (dotRing) {
+    for (let i = 0; i < 12; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'dot';
+      const angle = (i / 12) * Math.PI * 2;
+      const r = 64;
+      dot.style.left = (82 + r * Math.cos(angle)) + 'px';
+      dot.style.top = (82 + r * Math.sin(angle)) + 'px';
+      dot.style.opacity = i % 3 === 0 ? '1' : '0.35';
+      dotRing.appendChild(dot);
+    }
+  }
+})();
+
+const FATES = {
+  HL: { name: '红鸾情劫型', short: '情根深种，为情所困', color: 'rgba(224,92,122,0.8)' },
+  TL: { name: '贪狼情劫型', short: '欲望漩涡，人际纠葛', color: 'rgba(155,110,243,0.8)' },
+  PJ: { name: '破军情劫型', short: '动荡剧烈，破而后立', color: 'rgba(99,179,237,0.8)' },
+  TT: { name: '天同情劫型', short: '过度付出，滋养他人', color: 'rgba(72,187,120,0.8)' },
+  TY: { name: '太阴情劫型', short: '情绪共情，内耗敏感', color: 'rgba(196,160,255,0.8)' },
+  WQ: { name: '武曲化忌型', short: '现实牵扯，理性拉扯', color: 'rgba(237,175,90,0.8)' },
+};
+
+const FATE_DESC = {
+  HL: `你对情感的感知是敏锐的，也很容易被点燃。很多时候，并不是对方有多特别，而是那一瞬间的氛围、互动、甚至一个眼神，就足以让你迅速投入。你习惯用感觉来判断关系的方向，一旦心动，就会不自觉地放大对方的优点，同时降低对风险的警觉。你并不是看不清，而是更愿意相信那种可能会很美好的版本。\n\n在关系里，你常常走得比对方更快——情绪更深，期待更早建立。当现实与想象出现落差时，你容易反复回看最初的那份悸动，很难真正抽离。\n\n需要注意的是，你并不缺判断力，而是需要为情绪留出一点缓冲空间。试着在心动和行动之间，建立一个更清晰的观察期，让关系有机会在现实中被验证，而不是仅停留在感受层面。\n\n你的情劫，不在于遇错人，而在于你太容易在情感的开端，就交出自己生活的重心。`,
+  TL: `你对关系的期待，并不是单一维度的。你既需要被吸引、被激发，也希望关系具备稳定性和明确性。这种双重需求，让你在情感中既主动又审慎，也更容易在不同阶段产生拉扯感。你往往会被有魅力、有变化、带有某种不确定性的人吸引，因为那种互动本身就具有张力。但当关系逐渐趋于稳定，你对情绪体验的敏感度也会下降，开始重新评估这段关系是否真正满足你。这并不是因为你容易厌倦，而是你对连接质量的要求本身就更高。\n\n在很多关系中，你可能会经历一个循环：被吸引、投入、适应、再评估。这个过程让你不断调整自己的位置，也让你很难在某一段关系中完全停驻。你并不是不想稳定，而是很难在“有感觉”和“够确定”之间找到一个长期平衡点。\n\n你的选择并不需要每次都在两端之间切换。适当降低对持续刺激的依赖，同时也不过度追求绝对确定，反而更容易进入一段真实且可持续的关系。`,
+  PJ: `你对关系的态度往往是明确而强烈的。一旦进入，你会倾向于全力投入，希望关系有清晰的发展方向和足够的情感强度。对你来说，模糊和不确定并不是可以长期容忍的状态。这也使得你在面对关系变化时，更容易做出快速而决绝的反应。当你感受到失望、落差，或者关系不再符合预期时，你往往不会选择缓慢调整，而是直接重新定义甚至结束这段关系。这种方式在外人看来可能显得激烈，但对你而言，是一种维持自我完整性的方式。\n\n你并不缺乏情感深度，反而正因为重视，才无法接受将就式的维系。但与此同时，这种非黑即白的处理方式，也可能让你错过一些本可以通过沟通与调整而延续的关系。\n\n需要注意的是，并不是所有关系的变化都意味着失效。有些阶段性的波动，本身就是关系发展的组成部分。尝试在“立即判断”之前，多留出一些空间，允许关系在不完美中继续展开。`,
+  TT: `你在关系中的存在感，往往是温和而稳定的。你不习惯制造冲突，也很少主动推动对抗，更倾向于通过理解和包容来维持关系的平衡。对你来说，关系的“顺畅”本身就是一种重要价值。你会自然地优先考虑对方的感受，在很多细节上做出让步。这种特质让你很容易成为一个“好相处”的伴侣，但也可能让你在不知不觉中逐渐后退，把自己的需求放在次要位置。\n\n当关系长期处于这种状态时，你可能会发现，表面上没有明显问题，但内心的满足感却在下降。你开始适应对方，而不是被对方理解，关系也逐渐变成一种单向的维系。\n\n避免冲突并不等于维持关系。适度表达自己的感受和边界，不仅不会破坏稳定，反而有助于建立更真实的连接。关系的质量，往往取决于双方都能被看见，而不是一方持续退让。`,
+  TY: `你对情感的感知是细腻而深入的。你能够捕捉到关系中的微小变化，也会自然地从细节中推测对方的态度。这种敏感让你在关系中更投入，但也更容易受到波动的影响。你需要的并不是短暂的热烈，而是一种持续、稳定的回应感。当这种回应出现不连续时，你很容易产生不确定，并开始通过各种方式去确认关系的状态。这种确认有时是直接的沟通，有时则是更隐性的试探。\n\n从外部来看，这可能会被误解为多想或不安，但对你来说，这是一种维持连接的方式。你并不是缺乏安全感，而是对关系变化的容忍区间较小。\n\n并不是所有的情绪波动都需要被解释或验证。适当区分客观变化和主观感受，可以减少内耗，也能让关系保持更自然的流动。`,
+  WQ: `你在关系中的表现，往往是克制且有分寸的。你不轻易表达依赖，也不习惯把情绪放在表面，更倾向于通过观察和判断来决定关系的走向。对你来说，关系是否“合适”，往往比是否“强烈”更重要。当关系发展时，你会自然地进行评估：是否稳定、是否可持续、是否符合长期预期。这种理性让你在很多情况下避免了冲动选择，但也可能让关系缺乏足够的情绪连接。\n\n在面对问题时，你更倾向于分析和调整，而不是表达脆弱或需求。这种方式在短期内有效，但从长期来看，可能会让对方难以真正理解你，也难以建立更深层的亲密感。\n\n情感关系并不完全依赖于逻辑运作。适当表达不确定、需求甚至脆弱，并不会削弱你的掌控感，反而会让关系更具真实连接。真正的稳定，往往建立在被理解，而不是被管理之上。\n\n并不是所有的情绪波动都需要被解释或验证。适当区分客观变化和主观感受，可以减少内耗，也能让关系保持更自然的流动。
+`,
+};
+
+const FATE_ORACLE = {
+  HL: '多情不是问题，失衡才是。\n先把自己安放好，爱才不会变成劫。',
+  TL: '你要的从来不只是热烈。\n当心开始定下来，缘分才会真正显形。',
+  PJ: '不是每一次推翻都叫重生。\n真正的力量，是看清后仍能稳住自己。',
+  TT: '你的温柔值得被珍惜，而不是被默认。\n愿你在爱人之前，也学会站在自己这一边。',
+  TY: '你的敏感是天赋，不必拿来惩罚自己。\n把感受说出来，命运就会开始松动。',
+  WQ: '现实不是爱情的敌人，压抑自己感情才是。\n当你心里有秩序，关系也会慢慢归位。',
+};
+
+// 15题精选题库，确保6种命格均有充足得分空间
+// 每题最高可得分为3，15题总分上限约45分/维度（实际因分散约10-18分）
+const RAW_QUESTIONS = [
+  {
+    q: '对方回消息突然比平时慢很多，你更像哪种反应？',
+    opts: [
+      { t: '会忍不住看之前的聊天记录，猜是不是哪里不对了', s: { HL: 3, TY: 1 } },
+      { t: '先让自己转去做别的事，但心里还是会留意动静', s: { TY: 3 } },
+      { t: '直接去忙自己的事，对方想回自然会回', s: { PJ: 3 } },
+      { t: '会观察是不是最近双方节奏或安排真的变了', s: { WQ: 3 } },
+    ]
+  },
+  {
+    q: '当你真的很喜欢一个人时，最容易出现哪种变化？',
+    opts: [
+      { t: '会不自觉把很多事都围着对方转', s: { HL: 3 } },
+      { t: '会想把自己最好、最有魅力的一面持续展现出来', s: { TL: 3 } },
+      { t: '会更想确认彼此是否还能保持各自节奏', s: { PJ: 3 } },
+      { t: '会先观察长期适配度，再决定投入多少', s: { WQ: 3 } },
+    ]
+  },
+  {
+    q: '你更害怕关系里哪种"不确定"？',
+    opts: [
+      { t: '对方忽然变冷，却什么都不说', s: { HL: 3, TY: 1 } },
+      { t: '关系热度在下降，开始变得无聊和平', s: { TL: 3 } },
+      { t: '关系越来越黏，让我失去自己的呼吸感', s: { PJ: 3 } },
+      { t: '未来迟迟谈不清楚，现实方向始终模糊', s: { WQ: 3 } },
+    ]
+  },
+  {
+    q: '朋友失恋来找你倾诉，你多半会怎么陪他？',
+    opts: [
+      { t: '陪他一直聊，直到情绪彻底落下去为止', s: { TT: 3 } },
+      { t: '会代入得很深，回去后自己也跟着难受', s: { TY: 3 } },
+      { t: '劝他尽快抽离，别把自己耗在过去里', s: { PJ: 3 } },
+      { t: '帮他一起分析问题，到底是感情还是现实出了岔子', s: { WQ: 3 } },
+    ]
+  },
+  {
+    q: '如果对方最近压力很大，你更容易怎么做？',
+    opts: [
+      { t: '主动照顾对方情绪和生活，先让他缓过来', s: { TT: 3 } },
+      { t: '一边心疼，一边默默猜自己是不是也成了负担', s: { TY: 2, HL: 1 } },
+      { t: '给他空间，等他需要时自然会来找我', s: { PJ: 3 } },
+      { t: '会和他聊怎么分工、怎么处理现实压力', s: { WQ: 3 } },
+    ]
+  },
+  {
+    q: '吵架后对方沉默了半天，你更可能做什么？',
+    opts: [
+      { t: '先去哄，哪怕我也委屈，只想赶快和好', s: { TT: 2, HL: 1 } },
+      { t: '越等越焦虑，脑子里会自动演很多版本', s: { TY: 3 } },
+      { t: '会觉得既然不沟通，那我也没必要继续停在原地', s: { PJ: 3 } },
+      { t: '等彼此冷静后，再把问题拆开讲清楚', s: { WQ: 3 } },
+    ]
+  },
+  {
+    q: '你怎么看"暧昧期"这件事？',
+    opts: [
+      { t: '一旦心动就会想尽快确认，不想一直悬着', s: { HL: 3 } },
+      { t: '挺享受那个阶段，感觉最有张力也最迷人', s: { TL: 3 } },
+      { t: '顺其自然就好，不一定非要立刻定义关系', s: { PJ: 2, TY: 1 } },
+      { t: '可以有暧昧，但拖太久会让我怀疑诚意', s: { WQ: 3 } },
+    ]
+  },
+  {
+    q: '深夜情绪上来时，你脑子里最容易转的是什么？',
+    opts: [
+      { t: '某个放不下的人、放不下的细节', s: { HL: 3 } },
+      { t: '那些热烈、刺激、让人忘不掉的关系片段', s: { TL: 3 } },
+      { t: '我是不是又该把一些旧东西彻底翻篇了', s: { PJ: 3 } },
+      { t: '那些没说出口的感受，在心里一层层堆起来', s: { TY: 3 } },
+    ]
+  },
+  {
+    q: '如果你发现自己已经在关系里很累了，你通常会怎样？',
+    opts: [
+      { t: '还是会先想办法修补，舍不得轻易放下', s: { HL: 2, TT: 1 } },
+      { t: '会开始被外面的新鲜感吸走注意力', s: { TL: 3 } },
+      { t: '一旦确认不对，就会准备抽身重来', s: { PJ: 3 } },
+      { t: '会认真想清楚：累是沟通问题，还是现实结构的问题', s: { WQ: 3 } },
+    ]
+  },
+  {
+    q: '你更容易在什么情况下心软？',
+    opts: [
+      { t: '对方一示弱，我就很难继续坚持原则', s: { TT: 3 } },
+      { t: '只要想到曾经很相爱，就会舍不得翻篇', s: { HL: 3 } },
+      { t: '其实不太会，除非我也认可继续的意义', s: { PJ: 2, WQ: 1 } },
+      { t: '我会心软，但还是会看问题是否真的能解决', s: { WQ: 2, TY: 1 } },
+    ]
+  },
+  {
+    q: '你理想中的关系温度，更接近哪一种？',
+    opts: [
+      { t: '彼此很深地连在一起，像命运共同体', s: { HL: 3 } },
+      { t: '要有火花、有惊喜，也要一直保有吸引力', s: { TL: 3 } },
+      { t: '亲近但不过度捆绑，谁都能自在呼吸', s: { PJ: 3 } },
+      { t: '稳定、踏实，很多事都能一起落地', s: { WQ: 2, TT: 1 } },
+    ]
+  },
+  {
+    q: '别人最可能怎么评价你谈恋爱时的样子？',
+    opts: [
+      { t: '有点太认真了，容易一头扎进去', s: { HL: 3 } },
+      { t: '很有魅力，但也容易被情绪和新鲜感带着走', s: { TL: 3 } },
+      { t: '看着很洒脱，其实很多决定都很突然', s: { PJ: 3 } },
+      { t: '太会照顾别人了，经常把自己放后面', s: { TT: 3 } },
+    ]
+  },
+  {
+    q: '在关系里，你更难做到哪一件事？',
+    opts: [
+      { t: '真正承认这段感情已经结束', s: { HL: 3 } },
+      { t: '在一个人身上长期稳定地停下来', s: { TL: 3 } },
+      { t: '为了维持关系而长期压住自己的变化需求', s: { PJ: 3 } },
+      { t: '把自己的需求放在和对方同样重要的位置', s: { TT: 3 } },
+    ]
+  },
+  {
+    q: '当你觉得自己被忽略时，更像哪种反应？',
+    opts: [
+      { t: '会开始怀疑，是不是我对这段关系看得太重了', s: { HL: 3 } },
+      { t: '会想去别的地方找热度，把注意力拉回来', s: { TL: 3 } },
+      { t: '会把距离拉开，让自己重新回到自己的节奏', s: { PJ: 3 } },
+      { t: '会把情绪闷住，表面没事，心里其实已经积了很多', s: { TY: 3 } },
+    ]
+  },
+  {
+    q: '你希望一段成熟的关系最终带给你的是什么？',
+    opts: [
+      { t: '再深的情绪，也终于有了安放之处', s: { HL: 2, TY: 1 } },
+      { t: '热烈之后依然愿意彼此吸引、彼此选择', s: { TL: 3 } },
+      { t: '两个人都能成长，但谁也不会被关系吞没', s: { PJ: 3 } },
+      { t: '既有感情，也有现实上的并肩与共识', s: { WQ: 2, TT: 1 } },
+    ]
+  },
+];
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+let questions = [];
+let current = 0;
+// answers[i] = 已选选项的索引，null 表示未答
+let answers = [];
+let chartInstance = null;
+
+function reveal(id) {
+  const el = document.getElementById(id);
+  el.classList.remove('hidden');
+  el.setAttribute('aria-hidden', 'false');
+}
+
+function conceal(id) {
+  const el = document.getElementById(id);
+  el.classList.add('hidden');
+  el.setAttribute('aria-hidden', 'true');
+}
+
+// 从 answers 数组重新计算总分（避免累加错误）
+function calcScores() {
+  const s = { HL: 0, TL: 0, PJ: 0, TT: 0, TY: 0, WQ: 0 };
+  answers.forEach((idx, qi) => {
+    if (idx === null || idx === undefined) return;
+    const opt = questions[qi].opts[idx];
+    Object.entries(opt.s).forEach(([k, v]) => {
+      s[k] = (s[k] || 0) + v;
+    });
+  });
+  return s;
+}
+
+function startQuiz() {
+  questions = shuffle(RAW_QUESTIONS).map((q) => ({
+    ...q,
+    opts: shuffle(q.opts)
+  }));
+  current = 0;
+  answers = new Array(questions.length).fill(null);
+
+  conceal('screen-intro');
+  reveal('screen-quiz');
+  conceal('screen-loading');
+  conceal('screen-result');
+  renderQuestion();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  document.getElementById('q-current').textContent = current + 1;
+  document.getElementById('question-num').textContent = 'QUESTION ' + String(current + 1).padStart(2, '0');
+  document.getElementById('question-text').textContent = q.q;
+
+  const grid = document.getElementById('options-grid');
+  grid.innerHTML = '';
+
+  const labels = ['甲', '乙', '丙', '丁'];
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    if (answers[current] === i) btn.classList.add('selected');
+    btn.innerHTML = `<span class="option-label">${labels[i]}</span><span>${opt.t}</span>`;
+    btn.onclick = () => selectOption(i, btn);
+    grid.appendChild(btn);
+  });
+
+  document.getElementById('progress-fill').style.width = ((current / questions.length) * 100) + '%';
+
+  // 继续按钮：若该题已有答案则显示
+  const btnNext = document.getElementById('btn-next');
+  if (answers[current] !== null) {
+    btnNext.classList.add('visible');
+  } else {
+    btnNext.classList.remove('visible');
+  }
+
+  // 返回按钮：第一题隐藏
+  const btnPrev = document.getElementById('btn-prev');
+  if (current === 0) {
+    btnPrev.classList.add('hidden-btn');
+  } else {
+    btnPrev.classList.remove('hidden-btn');
+  }
+
+  const card = document.getElementById('question-card');
+  card.style.animation = 'none';
+  void card.offsetWidth;
+  card.style.animation = 'card-in 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+}
+
+function selectOption(idx, btn) {
+  document.querySelectorAll('.option-btn').forEach((b) => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  answers[current] = idx;
+  document.getElementById('btn-next').classList.add('visible');
+}
+
+function nextQuestion() {
+  if (answers[current] === null) return;
+
+  current += 1;
+  if (current >= questions.length) {
+    document.getElementById('progress-fill').style.width = '100%';
+    showLoading();
+    return;
+  }
+
+  renderQuestion();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function prevQuestion() {
+  if (current === 0) return;
+  current -= 1;
+  renderQuestion();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showLoading() {
+  conceal('screen-quiz');
+  conceal('screen-result');
+  reveal('screen-loading');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  setTimeout(showResult, 1800);
+}
+
+function showResult() {
+  conceal('screen-loading');
+  reveal('screen-result');
+
+  const scores = calcScores();
+  const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+  const [topKey, topScore] = sorted[0];
+  const fate = FATES[topKey];
+
+  document.getElementById('result-name').textContent = fate.name;
+  document.getElementById('result-tag').textContent = fate.short;
+  document.getElementById('result-desc').textContent = FATE_DESC[topKey];
+  document.getElementById('oracle-text').textContent = FATE_ORACLE[topKey];
+
+  const secondaryCard = document.getElementById('secondary-card');
+  const secondaryFates = document.getElementById('secondary-fates');
+  secondaryFates.innerHTML = '';
+
+  // 题目减少后适当降低阈值，保证次要命格有机会显示
+  const threshold = topScore * 0.65;
+  const secondaries = sorted.slice(1).filter(([, value]) => value >= threshold && value > 0);
+  if (secondaries.length > 0) {
+    secondaryCard.style.display = 'block';
+    secondaries.forEach(([key]) => {
+      const container = document.createElement('div');
+      container.className = 'secondary-item';
+
+      const header = document.createElement('div');
+      header.className = 'secondary-header';
+      header.innerHTML = `<span class="arrow">▶</span> <span class="name">${FATES[key].name}</span> <span class="expand-text">点此展开更多</span>`;
+      header.onclick = () => toggleSecondary(container);
+
+      const content = document.createElement('div');
+      content.className = 'secondary-content';
+      content.textContent = FATE_DESC[key];
+
+      container.appendChild(header);
+      container.appendChild(content);
+      secondaryFates.appendChild(container);
+    });
+  } else {
+    secondaryCard.style.display = 'none';
+  }
+
+  renderChart(scores);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderChart(scores) {
+  if (chartInstance) chartInstance.destroy();
+
+  const labels = Object.keys(FATES).map((key) => FATES[key].name.replace('情劫型', '').replace('化忌型', ''));
+  const data = Object.keys(FATES).map((key) => scores[key] || 0);
+  const colors = Object.keys(FATES).map((key) => FATES[key].color);
+  const borderColors = colors.map((c) => c.replace('0.8)', '1)'));
+
+  // 动态最大值，避免题目减少后雷达图过小
+  const maxVal = Math.max(...data, 6) + 2;
+
+  const ctx = document.getElementById('fate-chart').getContext('2d');
+  chartInstance = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels,
+      datasets: [{
+        label: '命格能量',
+        data,
+        backgroundColor: 'rgba(201,168,76,0.08)',
+        borderColor: 'rgba(201,168,76,0.7)',
+        pointBackgroundColor: borderColors,
+        pointBorderColor: borderColors,
+        pointRadius: 5,
+        pointHoverRadius: 7,
+        borderWidth: 1.5,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(15,15,26,0.95)',
+          borderColor: 'rgba(201,168,76,0.3)',
+          borderWidth: 1,
+          titleColor: '#c9a84c',
+          bodyColor: '#e8dfc8',
+          callbacks: {
+            label: (ctx) => `  ${ctx.raw} 分`
+          }
+        }
+      },
+      scales: {
+        r: {
+          min: 0,
+          max: maxVal,
+          grid: { color: 'rgba(255,255,255,0.07)' },
+          angleLines: { color: 'rgba(201,168,76,0.12)' },
+          ticks: {
+            display: false,
+            stepSize: Math.ceil(maxVal / 4),
+          },
+          pointLabels: {
+            color: 'rgba(232,223,200,0.7)',
+            font: { size: 10, family: 'Noto Serif SC' },
+          }
+        }
+      }
+    }
+  });
+}
+
+function toggleSecondary(container) {
+  container.classList.toggle('expanded');
+}
+
+function restart() {
+  conceal('screen-quiz');
+  conceal('screen-loading');
+  conceal('screen-result');
+  reveal('screen-intro');
+  if (chartInstance) {
+    chartInstance.destroy();
+    chartInstance = null;
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
