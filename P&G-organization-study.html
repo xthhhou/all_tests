@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>P&G｜组织架构、经营责任与 KPI 机制</title>
+<style>
+:root{--navy:#12355b;--blue:#1e5f9e;--sky:#eaf2f9;--ink:#17212b;--muted:#667482;--line:#d9e1e8;--green:#18794e;--greenbg:#edf8f2;--red:#b13b3b;--redbg:#fff2f2;--gray:#f5f7f9;--white:#fff}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#fff;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",Arial,sans-serif;line-height:1.55}
+.wrap{max-width:1400px;margin:auto;padding:0 34px}.hero{padding:70px 0 48px;border-bottom:1px solid var(--line);background:linear-gradient(90deg,#fff 0,#fff 70%,#f6f9fc 100%)}
+.kicker{font-size:13px;letter-spacing:.16em;color:var(--blue);font-weight:700}.hero h1{font-size:42px;line-height:1.15;margin:14px 0 12px;letter-spacing:-.03em}.hero p{max-width:850px;color:var(--muted);font-size:17px;margin:0}
+nav{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}nav .wrap{display:flex;gap:24px;overflow:auto}nav a{padding:15px 0;color:#52606d;text-decoration:none;font-size:13px;white-space:nowrap}nav a:hover{color:var(--blue)}
+section{padding:72px 0;border-bottom:1px solid var(--line)}.section-no{font-size:12px;color:var(--blue);font-weight:800;letter-spacing:.12em}.section-title{font-size:30px;margin:7px 0 8px;letter-spacing:-.02em}.section-sub{color:var(--muted);max-width:950px;margin:0 0 30px}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:22px}.soft{background:var(--gray)}.blue{background:var(--sky);border-color:#c9dced}
+.grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.sbu{min-height:125px;cursor:pointer;transition:.18s;border-top:4px solid #b9c8d8}.sbu{cursor:pointer;transition:.18s ease}.sbu:hover{border-color:#8eaac2;transform:translateY(-1px)}.sbu.active{border-top-color:var(--blue);background:#f4f8fc;transform:translateY(-2px)}.sbu b{display:block;font-size:16px}.sbu span{font-size:12px;color:var(--muted)}
+.org-layout{display:grid;grid-template-columns:1.25fr .9fr;gap:28px;align-items:stretch}.org-main{position:relative}.group-title{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:10px}.root{padding:18px;text-align:center;background:var(--navy);color:#fff;border-radius:9px;font-weight:800;font-size:19px;margin-bottom:18px}.branch{display:flex;gap:12px}.branch .card{flex:1;text-align:center}.connector{height:28px;position:relative}.connector:before{content:"";position:absolute;left:50%;top:0;bottom:0;border-left:1px solid #b8c5d0}.connector-row{height:28px;position:relative}.connector-row:before{content:"";position:absolute;left:10%;right:10%;top:50%;border-top:1px solid #b8c5d0}.connector-row:after{content:"";position:absolute;left:50%;top:50%;height:14px;border-left:1px solid #b8c5d0}
+.lines{display:grid;grid-template-columns:1fr 1fr;gap:14px}.line-box{padding:20px;border:1px solid var(--line);border-radius:10px}.line-box h3{margin:0 0 8px}.line-box ul{margin:10px 0 0;padding-left:18px;color:#52606d}
+.togglebar{display:flex;gap:8px;margin:24px 0}.toggle{border:1px solid var(--line);background:#fff;padding:9px 15px;border-radius:6px;cursor:pointer}.toggle.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.detail{display:grid;grid-template-columns:1.1fr .9fr;gap:22px}.hierarchy{display:flex;align-items:center;gap:0}.node{flex:1;text-align:center;padding:18px 10px;border:1px solid var(--line);background:#fff}.arrow{font-size:22px;color:#8a98a5;padding:0 8px}.role{height:100%;border-left:4px solid var(--blue)}
+.case{position:relative;padding:30px}.case-grid{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:24px;align-items:center}.brands{display:grid;gap:10px}.brand{border:1px solid var(--line);padding:15px;border-radius:8px;background:#fff}.brand b{display:block}.customer{background:var(--sky);border:1px solid #c9dced;border-radius:12px;padding:25px;text-align:center}.customer h3{margin:0 0 12px}.customer ul{display:grid;grid-template-columns:1fr 1fr;text-align:left;gap:7px;padding-left:18px;color:#52606d;font-size:13px}.retail{border:2px solid var(--navy);border-radius:12px;padding:24px;text-align:center}.retail .store{display:flex;gap:8px;margin-top:15px}.store span{flex:1;background:var(--gray);padding:10px;font-size:12px}
+.kpi{position:relative}.kpi h3{margin:0 0 4px}.question{font-weight:700;color:var(--blue);font-size:15px}.chips{display:flex;flex-wrap:wrap;gap:7px;margin:15px 0}.chip{background:var(--gray);border:1px solid var(--line);padding:6px 9px;border-radius:5px;font-size:12px;cursor:help;position:relative}.chip:hover:after{content:attr(data-tip);position:absolute;left:0;bottom:calc(100% + 8px);width:230px;padding:9px;background:#17212b;color:#fff;border-radius:6px;font-size:11px;line-height:1.45;z-index:10}.caption{font-size:12px;color:var(--muted)}
+.cascade{display:grid;gap:0;max-width:900px}.level{display:grid;grid-template-columns:210px 1fr;align-items:center;border:1px solid var(--line);border-bottom:0;padding:18px 22px;background:#fff}.level:first-child{border-radius:9px 9px 0 0}.level:last-child{border-bottom:1px solid var(--line);border-radius:0 0 9px 9px}.level b{color:var(--navy)}.wrong{background:var(--redbg);border:1px solid #edcaca;border-radius:9px;padding:22px}.correct{background:var(--greenbg);border:1px solid #c9e5d5;border-radius:9px;padding:22px}.big-claim{font-size:25px;font-weight:800;margin-top:8px}.formula{font-size:24px;text-align:center;padding:30px;background:#f7fafc;border:1px solid var(--line);border-radius:10px;margin-top:25px}.formula b{color:var(--navy)}
+.why{min-height:190px}.why .num{font-size:12px;color:var(--blue);font-weight:800}.why h3{margin:7px 0}.why p{color:var(--muted);font-size:14px}.mapping{display:grid;grid-template-columns:1fr 70px 1fr;gap:10px;align-items:center}.map-row{padding:14px 18px;border:1px solid var(--line);border-radius:8px}.map-arrow{text-align:center;color:var(--blue);font-size:24px}
+table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:9px;overflow:hidden}th,td{text-align:left;padding:15px 16px;border-bottom:1px solid var(--line);vertical-align:top;font-size:14px}th{background:var(--navy);color:#fff;font-size:13px}tr:last-child td{border-bottom:0}.note{font-size:12px;color:var(--muted);border-left:3px solid #b7c3cf;padding-left:12px}.source{font-size:11px;color:#788591;margin-top:24px}.source a{color:var(--blue)}
+.conclusion{background:#f6f9fc}.conclusion h2{font-size:40px;max-width:1000px;line-height:1.18;margin:12px 0 28px}.not{font-size:18px;color:var(--muted)}.yes{font-size:25px;font-weight:800;color:var(--navy);margin:10px 0 32px}.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.step{background:#fff;border:1px solid var(--line);padding:22px;text-align:center}.step b{display:block;font-size:18px;margin-bottom:7px}.footer{padding:35px 0;color:#7b8792;font-size:11px}
+@media(max-width:900px){.wrap{padding:0 18px}.hero h1{font-size:32px}.grid5,.grid4,.grid3,.org-layout,.detail,.case-grid,.lines,.steps{grid-template-columns:1fr}.mapping{grid-template-columns:1fr}.map-arrow{transform:rotate(90deg)}.branch{flex-direction:column}.hierarchy{flex-direction:column}.arrow{transform:rotate(90deg)}.level{grid-template-columns:1fr}.case{padding:20px}}
+<style>
+.mo-diagram{position:relative;padding-top:6px}.mo-center{background:var(--navy);color:#fff;border-radius:8px;padding:16px;text-align:center;margin:0 auto 18px;max-width:260px}.mo-center b{display:block}.mo-center span{font-size:11px;opacity:.8}.mo-branches{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;position:relative}.mo-branches:before{content:"";position:absolute;left:10%;right:10%;top:-10px;border-top:1px solid #b8c5d0}.mo-item{background:var(--gray);border:1px solid var(--line);border-radius:7px;padding:10px;text-align:center;min-height:70px}.mo-item b{display:block;font-size:12px}.mo-item span{font-size:10px;color:var(--muted)}.chip.active-cat{background:#dbeaf7;border-color:#9fbfd9;color:var(--navy);font-weight:700}@media(max-width:900px){.mo-branches{grid-template-columns:1fr 1fr}.mo-branches:before{display:none}}
+<style>
+.focus-example{margin-top:12px;padding:10px 12px;border-left:3px solid #4d79a3;background:#eef4f8;border-radius:0 6px 6px 0}
+.focus-example b{display:block;color:var(--navy);font-size:12px;margin-bottom:3px}
+.focus-example span{display:block;color:#687786;font-size:11px;line-height:1.55}
+</style></style></style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+<div class="kicker">EXECUTIVE RESEARCH · ORGANIZATION &amp; MANAGEMENT</div>
+<h1>宝洁（P&amp;G）的组织架构、经营责任与 KPI 机制</h1>
+<p>从 Business Unit / Product Category 到 Market / Customer，再到最终执行。核心问题不是“谁管谁”，而是：<b>谁对什么结果负责，以及谁拥有做出这个结果所需的决策权。</b></p>
+</div></header>
+<nav><div class="wrap">
+<a href="#s1">01 组织架构</a><a href="#s2">02 SBU</a><a href="#s3">03 Walmart案例</a><a href="#s4">04 KPI与权责</a><a href="#s5">05 为什么能运转</a><a href="#s6">06 华住启示</a>
+</div></nav>
+
+<section id="s1"><div class="wrap">
+<div class="section-no">01 / ORGANIZATION</div>
+<h2 class="section-title">宝洁的组织逻辑：纵向经营业务，横向经营市场</h2>
+<p class="section-sub">先把三个概念分开：<b>SBU / Product Category 是业务经营线</b>；<b>Market Operations 是重点市场中的横向市场运营线</b>；<b>Customer Teams 是 Market Operations 中面向客户的能力</b>。终端执行是商业结果落地层，不是与 SBU 并列的另一条正式组织线。</p>
+<div class="org-layout">
+<div class="org-main">
+<div class="group-title">纵向条线｜Business Line：经营“我的业务”</div>
+<div class="root">宝洁集团 · P&amp;G</div><div class="connector"></div>
+<div class="grid5" id="sbuGrid">
+<div class="card sbu active" data-sbu="fabric"><b>织物及家居护理</b><span>Fabric &amp; Home Care · SBU</span></div>
+<div class="card sbu" data-sbu="baby"><b>母婴、女性及家庭护理</b><span>Baby, Feminine &amp; Family Care · SBU</span></div>
+<div class="card sbu" data-sbu="beauty"><b>美容</b><span>Beauty · SBU</span></div>
+<div class="card sbu" data-sbu="health"><b>健康护理</b><span>Health Care · SBU</span></div>
+<div class="card sbu" data-sbu="grooming"><b>男士护理</b><span>Grooming · SBU</span></div>
+</div><div class="connector-row"></div>
+<div class="card blue"><b>Product Categories · 10个产品品类</b><p class="caption" style="margin:7px 0 10px">点击任意 SBU，查看其下属产品品类；点击品类可进一步切换示例。</p>
+<div id="categoryButtons" style="display:flex;flex-wrap:wrap;gap:7px"></div></div>
+</div>
+<div>
+<div class="group-title">横向条线｜Market Operations：经营“我所在的重点市场”</div>
+<div class="card blue" style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start">
+<div><h3 style="margin:0 0 5px">什么是 Focus Markets？</h3>
+<p style="margin:0;color:#52606d;font-size:13px">P&amp;G 最大、最盈利的市场，约贡献公司 <b>80% 销售额</b>和 <b>90% 税后利润</b>。在这些市场，SBU 对销售、利润、现金和价值创造承担端到端责任。</p>
+<div class="focus-example"><b>例：中国 / Greater China</b><span>历史上曾被 P&amp;G 官方明确称为其最大的、最盈利的市场之一；但 P&amp;G 当前公开资料并未逐一披露 Focus Markets 的完整国家名单，因此页面不把“中国”直接标注为当前 Focus Market。</span></div>
+</div>
+<div style="min-width:110px;text-align:right"><b style="font-size:23px;color:var(--navy)">80% / 90%</b><br><span class="caption">销售 / 税后利润</span></div></div></div>
+<div class="card"><div class="mo-diagram"><div class="mo-center"><b>Market Operations</b><span>横跨五个 SBU 的市场服务与运营能力</span></div>
+<div class="mo-branches">
+<div class="mo-item"><b>Customer Teams</b><span>客户关系、销售与商业协同</span></div>
+<div class="mo-item"><b>Transportation</b><span>运输</span></div><div class="mo-item"><b>Warehousing</b><span>仓储</span></div>
+<div class="mo-item"><b>Logistics</b><span>物流</span></div><div class="mo-item"><b>External Representation</b><span>对外代表 P&amp;G</span></div>
+</div></div></div>
+<div class="card soft" style="margin-top:14px"><b>三层概念从这里统一</b>
+<div class="map-row" style="margin-top:12px"><b>① Business Line</b>　SBU → Product Category → Brand / Consumer proposition<br><span class="caption">回答：我的业务有没有赢？</span></div>
+<div class="map-row" style="margin-top:8px"><b>② Market Operations → Customer Teams</b>　横跨 SBU 提供市场服务，其中 Customer Teams 面向客户<br><span class="caption">回答：这个重点市场如何把各业务的生意做大、做顺？</span></div>
+<div class="map-row" style="margin-top:8px"><b>③ Commercial Execution</b>　客户 → 渠道 / 零售终端 → 消费者<br><span class="caption">强调商业结果落地，不把它误写成与 SBU 并列的正式组织单元。</span></div>
+</div></div></div>
+<div class="source">资料依据：<a href="https://us.pg.com/structure-and-governance/corporate-structure/" target="_blank">P&amp;G Corporate Structure</a>；<a href="https://us.pg.com/annualreport2025/organization-agile-empowered-and-accountable/" target="_blank">P&amp;G 2025 Annual Report — Organization</a>；历史案例参考 <a href="https://us.pg.com/annualreport2021/introduction-and-fy-results/" target="_blank">P&amp;G 2021 Annual Report</a>。</div>
+</div></section>
+
+<section id="s2"><div class="wrap">
+<div class="section-no">02 / BUSINESS LINE DEEP DIVE</div><h2 class="section-title">放大看：一个 SBU 如何沿业务线向下经营？</h2>
+<p class="section-sub">这一页只看<b>纵向 Business Line</b>：SBU 是业务经营单元，下面管理 Product Categories；品牌是品类中的消费者资产。不要把 SBU 与品牌画成同一层级。</p>
+<div class="togglebar" id="sbuToggle"></div>
+<div class="detail"><div class="card"><div class="group-title">Business Line｜业务经营链</div><div class="hierarchy">
+<div class="node"><b id="dSbu">织物及家居护理</b><br><span class="caption">SBU</span></div><div class="arrow">→</div>
+<div class="node"><b id="dCat">Fabric Care</b><br><span class="caption">Product Category</span></div><div class="arrow">→</div>
+<div class="node"><b id="dBrand">Tide</b><br><span class="caption">Brand example</span></div></div>
+<div class="note" style="margin-top:20px">品牌仅用于帮助理解业务层级；不据此推断某个品牌对应一个未公开的独立 BU 岗位。</div></div>
+<div class="card role"><div class="group-title">SBU / Category 经营责任</div><h3>业务负责人 · Business Owner</h3><ul><li>业务增长</li><li>利润与现金</li><li>产品品类战略</li><li>创新与品牌战略</li><li>价值创造</li></ul><div class="big-claim">核心角色：对“我的业务”负责</div></div></div>
+<div class="card soft" style="margin-top:18px"><b>与第一部分保持一致</b><p style="margin-bottom:0">SBU / Category 负责业务本身；在 Focus Markets 中，Market Operations 横跨五个 SBU 提供市场服务能力，其中 Customer Teams 是面向客户的关键能力。两者是<b>不同维度</b>，不是上下级关系。</p></div>
+</div></section>
+
+<section id="s3"><div class="wrap">
+<div class="section-no">03 / CUSTOMER CASE</div><h2 class="section-title">一个客户，可以同时承载多个宝洁业务</h2>
+<p class="section-sub">这一页把第一部分的横向线展开：<b>Market Operations 是横向市场运营层，Customer Teams 是其中面向客户的能力</b>。Walmart 只是帮助理解“多个业务如何共享一个客户商业关系”的示意案例。</p>
+<div class="card case"><div class="case-grid">
+<div><div class="group-title">纵向 Business Line｜不同 SBU / Category</div><div class="brands">
+<div class="brand"><b>织物护理</b><span class="caption">Tide</span></div><div class="brand"><b>男士护理</b><span class="caption">Gillette</span></div>
+<div class="brand"><b>婴儿护理</b><span class="caption">Pampers</span></div><div class="brand"><b>美容</b><span class="caption">Olay</span></div></div></div>
+<div class="customer"><div class="group-title" style="color:#46627b">横向 Market Operations</div><h3>Customer Teams</h3><div class="caption">Market Operations 中面向客户的能力</div>
+<ul><li>客户关系</li><li>销售与谈判</li><li>铺货与分销</li><li>货架 / 陈列协同</li><li>促销协同</li><li>价格与贸易条件</li><li>联合生意计划</li><li>Trade Investment</li></ul></div>
+<div><div class="retail"><h3 style="margin:0">Walmart</h3><div class="caption">Customer / Retailer</div><div class="store"><span>门店</span><span>货架</span><span>电商</span></div></div><div style="text-align:center;font-size:25px;color:#8a98a5;margin:8px">↓</div><div class="card soft" style="text-align:center;padding:14px"><b>消费者</b><br><span class="caption">最终购买与品牌选择</span></div></div>
+</div></div>
+<div class="grid3" style="margin-top:16px">
+<div class="card"><b>Business Line</b><p class="caption">经营“我的产品 / 品类生意”：增长、利润、创新、价值创造。</p></div>
+<div class="card blue"><b>Market Operations → Customer Teams</b><p class="caption">经营“市场与客户”：在重点市场提供规模化市场能力，其中 Customer Teams 负责客户关系与商业协同。</p></div>
+<div class="card"><b>Commercial Execution</b><p class="caption">经营“最终落地”：客户、渠道、零售终端到消费者之间的商品、价格、陈列与促销执行。</p></div>
+</div>
+<div class="note" style="margin-top:18px">分析边界：P&amp;G 官方明确将 Customer Teams 列为 Market Operations 的市场服务能力；“Commercial Execution”在本页面用于表达经营结果落地层，而不是声称存在一个与 SBU / Market Operations 并列的正式组织单元。</div>
+</div></section>
+
+<section id="s4"><div class="wrap">
+<div class="section-no">04 / ACCOUNTABILITY &amp; KPI</div><h2 class="section-title">三层责任：业务、客户、执行，分别看什么？</h2>
+<p class="section-sub">沿用前面同一套概念：<b>Business Line → Market Operations / Customer Teams → Commercial Execution</b>。其中前两者是组织 / 能力维度，第三层是经营结果落地维度。</p>
+<div class="grid3">
+<div class="card kpi"><div class="group-title">01 · Business Line</div><h3>SBU / Category · 业务负责人</h3><div class="question">“我的业务有没有赢？”</div><ul><li>业务增长</li><li>利润</li><li>市场份额</li><li>创新与品牌健康</li><li>现金与价值创造</li></ul><div class="chips"><span class="chip" data-tip="衡量有机收入增长，是 P&G 核心经营指标之一。">Organic Sales Growth</span><span class="chip" data-tip="经营利润表现。">Operating Profit</span><span class="chip" data-tip="衡量类别/市场中的竞争位置。">Market Share</span><span class="chip" data-tip="P&G 官方组织责任包含现金与价值创造。">Cash / Value Creation</span></div><p class="caption">看整体业务结果，并拥有与之匹配的端到端决策权。</p></div>
+<div class="card kpi"><div class="group-title">02 · Market Operations → Customer Teams</div><h3>客户经营负责人</h3><div class="question">“这个市场 / 客户里的生意有没有赢？”</div><ul><li>客户关系</li><li>客户销售</li><li>铺货与分销</li><li>价格 / 促销协同</li><li>联合生意计划</li><li>Trade Investment</li></ul><div class="chips"><span class="chip" data-tip="分析归纳：衡量特定客户贡献的销售结果。">客户销售额</span><span class="chip" data-tip="分析归纳：衡量 P&G 在客户整体生意中的竞争位置。">客户份额</span><span class="chip" data-tip="分析归纳：衡量商品覆盖与可购买性。">铺货率</span><span class="chip" data-tip="分析归纳：衡量贸易投入产生的商业回报。">促销 ROI</span></div><p class="caption">Customer Teams 是 Market Operations 的关键能力，不与 Market Operations 并列成另一条组织线。</p></div>
+<div class="card kpi"><div class="group-title">03 · Commercial Execution</div><h3>终端执行结果</h3><div class="question">“策略最终有没有落地？”</div><ul><li>商品是否有货</li><li>货架是否到位</li><li>陈列是否符合要求</li><li>促销是否落地</li><li>消费者是否能买到</li></ul><div class="chips"><span class="chip" data-tip="分析归纳：商品在消费者需要时可被购买的程度。">可得率</span><span class="chip" data-tip="分析归纳：商品覆盖目标终端的程度。">铺货率</span><span class="chip" data-tip="分析归纳：货架与陈列是否达到约定标准。">货架执行</span><span class="chip" data-tip="分析归纳：促销活动是否按计划执行。">促销执行率</span></div><p class="caption">这是经营落地层，不把它误写成 P&amp;G 的第四条正式组织线。</p></div>
+</div>
+<h3 style="margin-top:48px">KPI 不是简单地“层层复制”</h3>
+<div class="detail"><div><div class="cascade">
+<div class="level"><b>集团 / Company</b><span>销售 / 利润 / 现金 / 价值创造</span></div>
+<div class="level"><b>Business Line / SBU</b><span>业务增长 / 利润 / 市占 / 现金</span></div>
+<div class="level"><b>Market Operations / Customer</b><span>市场 / 客户商业表现、铺货、促销与客户回报</span></div>
+<div class="level"><b>Commercial Execution</b><span>有货 / 货架 / 陈列 / 促销执行</span></div></div></div>
+<div><div class="wrong"><b style="color:var(--red)">错误做法：KPI 重复</b><p>集团：销售额<br>SBU：销售额<br>客户：销售额<br>门店：销售额</p><p class="caption">所有层级都背同一个销售指标，并不等于 KPI 拆解。</p></div>
+<div class="correct" style="margin-top:14px"><b style="color:var(--green)">正确逻辑：按“可控性”拆 KPI</b><p>上层看整体结果；业务看业务结果；客户团队看客户商业结果；执行层看最终落地结果。</p></div></div></div>
+<div class="formula">KPI 应该与 <b>“能够控制什么”</b> 相匹配</div>
+</div></section>
+
+<section id="s5"><div class="wrap">
+<div class="section-no">05 / WHY IT WORKS</div><h2 class="section-title">宝洁真正解决的，不是“有没有矩阵”，而是“谁真正对结果负责”</h2>
+<div class="grid3">
+<div class="card why"><div class="num">01 / ACCOUNTABILITY</div><h3>一个结果，需要明确的最终负责人</h3><p>一个核心经营结果不能只是“大家共同负责”，必须明确最终 Accountability。</p></div>
+<div class="card why"><div class="num">02 / DECISION RIGHTS</div><h3>责任和决策权必须匹配</h3><p>如果一个人需要对一个结果负责，就应该拥有影响这个结果的重要决策权。</p><div class="caption">例如：负责 RevPAR 却不能决定价格；负责利润却不能决定资源。</div></div>
+<div class="card why"><div class="num">03 / BOUNDARIES</div><h3>共同经营，但不要重复决策</h3><p>业务团队与客户团队可以共同影响商业结果，但解决的问题不同、权责边界不同。</p></div>
+</div>
+<div class="formula"><b>经营结果</b> = <b>责任人</b> ＋ <b>相匹配的决策权</b> ＋ <b>可控的 KPI</b></div>
+</div></section>
+
+<section id="s6" class="conclusion"><div class="wrap">
+<div class="section-no">06 / IMPLICATIONS FOR HUAZHU</div><h2 class="section-title">从 P&amp;G 看华住：品牌 × 区域 × 门店如何分权？</h2>
+<div class="note">以下不是 P&amp;G 与华住的组织一一对应，而是从“经营责任”角度进行类比。</div>
+<div class="mapping" style="margin:30px 0 42px">
+<div class="map-row"><b>P&amp;G：业务 / Category</b><br><span class="caption">业务增长、品类战略、创新、价值创造</span></div><div class="map-arrow">→</div><div class="map-row"><b>华住：品牌事业部</b><br><span class="caption">品牌增长、品牌竞争力、新店成功等</span></div>
+<div class="map-row"><b>P&amp;G：Market / Customer</b><br><span class="caption">市场与客户商业表现</span></div><div class="map-arrow">→</div><div class="map-row"><b>华住：区域</b><br><span class="caption">区域经营、区域增长、资源配置</span></div>
+<div class="map-row"><b>P&amp;G：终端执行</b><br><span class="caption">有货、货架、陈列、促销落地</span></div><div class="map-arrow">→</div><div class="map-row"><b>华住：门店</b><br><span class="caption">单店经营、服务与执行</span></div>
+</div>
+<h2 class="section-title">P&amp;G 给华住留下的真正问题</h2>
+<div class="card" style="padding:0;overflow:auto">
+<table><thead><tr><th style="width:28%">应该明确什么</th><th>华住需要回答的问题</th></tr></thead><tbody>
+<tr><td><b>品牌事业部对什么结果负责？</b></td><td>品牌增长、品牌竞争力、新店成功等</td></tr>
+<tr><td><b>区域对什么结果负责？</b></td><td>区域经营、区域增长、资源配置等</td></tr>
+<tr><td><b>店长对什么结果负责？</b></td><td>单店 RevPAR、GOP、服务、执行等</td></tr>
+<tr><td><b>谁拥有价格权？</b></td><td>品牌规则、区域调整、门店授权如何划分</td></tr>
+<tr><td><b>谁拥有促销权？</b></td><td>全国品牌促销、区域促销、本地促销如何分</td></tr>
+<tr><td><b>谁拥有产品标准权？</b></td><td>品牌统一标准 vs 区域 / 门店适配</td></tr>
+<tr><td><b>一个指标由谁最终负责？</b></td><td>必须有唯一 Accountable Owner</td></tr>
+<tr><td><b>KPI 如何拆？</b></td><td>按“可控性”而不是简单层层复制</td></tr>
+</tbody></table></div>
+<div style="margin-top:58px">
+<div class="section-no">EXECUTIVE TAKEAWAY</div>
+<h2 style="font-size:38px;max-width:1050px;line-height:1.2;margin:10px 0 20px">P&amp;G 对华住最值得借鉴的，不是组织架构，而是权责逻辑。</h2>
+<div class="not">不是：</div><div class="yes">“品牌和区域谁管谁？”</div>
+<div class="not">而是：</div><div class="yes">“谁对什么结果负责？谁拥有做出这个结果所需的决策权？”</div>
+<div class="steps"><div class="step"><b>经营结果</b><span class="caption">先定义要赢什么</span></div><div class="step"><b>唯一责任人</b><span class="caption">明确 Accountable Owner</span></div><div class="step"><b>匹配决策权</b><span class="caption">给责任人足够的控制权</span></div><div class="step"><b>按可控性设 KPI</b><span class="caption">避免指标层层复制</span></div></div>
+<p style="font-size:19px;font-weight:700;margin-top:32px">矩阵并不可怕。真正的问题是：一个结果有很多人参与，却没有一个人真正拥有结果。</p>
+</div>
+</div></section>
+
+<footer class="footer"><div class="wrap">
+研究口径：P&amp;G 官方公开资料 + 基于公开组织结构的管理机制分析。凡标注“分析归纳”的内容，不应理解为 P&amp;G 对具体岗位 KPI / 汇报关系的官方完整规定。
+<br><br>主要资料：<a href="https://us.pg.com/structure-and-governance/corporate-structure/" target="_blank">P&amp;G Corporate Structure</a> · <a href="https://us.pg.com/annualreport2025/" target="_blank">P&amp;G 2025 Annual Report</a> · <a href="https://us.pg.com/annualreport2025/organization-agile-empowered-and-accountable/" target="_blank">Organization: Agile, Empowered and Accountable</a> · <a href="https://us.pg.com/annualreport2025/financial-highlights/" target="_blank">Financial Highlights</a>
+</div></footer>
+
+<script>
+const data={
+fabric:{name:"织物及家居护理",cats:["Fabric Care","Home Care"],brand:"Tide"},
+baby:{name:"母婴、女性及家庭护理",cats:["Baby Care","Feminine Care","Family Care"],brand:"Pampers"},
+beauty:{name:"美容",cats:["Hair Care","Skin & Personal Care"],brand:"Olay"},
+health:{name:"健康护理",cats:["Oral Care","Personal Health Care"],brand:"Oral-B"},
+grooming:{name:"男士护理",cats:["Grooming"],brand:"Gillette"}
+};
+const toggle=document.getElementById("sbuToggle"), categoryButtons=document.getElementById("categoryButtons");
+Object.entries(data).forEach(([key,v])=>{const x=document.createElement("button");x.className="toggle"+(key==="fabric"?" active":"");x.textContent=v.name;x.onclick=()=>setSbu(key);toggle.appendChild(x);});
+function setSbu(key){
+ const v=data[key];
+ document.querySelectorAll(".sbu").forEach(x=>x.classList.toggle("active",x.dataset.sbu===key));
+ document.querySelectorAll("#sbuToggle .toggle").forEach(x=>x.classList.toggle("active",x.textContent===v.name));
+ categoryButtons.innerHTML="";
+ v.cats.forEach((c,i)=>{const x=document.createElement("button");x.className="chip"+(i===0?" active-cat":"");x.textContent=c;x.onclick=()=>selectCategory(c);categoryButtons.appendChild(x);});
+ document.getElementById("dSbu").textContent=v.name;document.getElementById("dCat").textContent=v.cats[0];document.getElementById("dBrand").textContent=v.brand;
+}
+function selectCategory(c){document.querySelectorAll("#categoryButtons .chip").forEach(x=>x.classList.toggle("active-cat",x.textContent===c));document.getElementById("dCat").textContent=c;}
+document.querySelectorAll("#sbuGrid .sbu").forEach(card=>{
+  card.addEventListener("click",()=>setSbu(card.dataset.sbu));
+});
+setSbu("fabric");
+</script>
+</body>
+</html>
